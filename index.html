@@ -10,8 +10,9 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<div class="toggles"><button id="muteBtn" aria-pressed="false" aria-label="Mute sounds" title="Sound">🔔</button><button id="nightBtn" aria-pressed="false" aria-label="Switch to night" title="Day / night">🌙</button></div>
 <div class="scene" aria-hidden="true">
-  <div class="sun"></div>
+  <div class="sun"></div><div class="stars"></div>
   <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
   <div class="hill h1"></div><div class="hill h2"></div>
   <div class="flowers" id="flowers"></div>
@@ -22,6 +23,7 @@
   <div class="tabs" role="tablist">
     <button role="tab" id="tab-timer" aria-selected="true" data-tab="timer">Timer</button>
     <button role="tab" id="tab-stopwatch" aria-selected="false" data-tab="stopwatch">Stopwatch</button>
+    <button role="tab" id="tab-pomodoro" aria-selected="false" data-tab="pomodoro">Pomodoro</button>
     <span class="tab-pill"></span>
   </div>
 
@@ -63,7 +65,26 @@
     </div>
     <ol class="laps" id="laps"></ol>
   </section>
-  <p class="hint">Space starts and pauses. Press L for a lap.</p>
+  <section id="pomodoro" class="panel" role="tabpanel" hidden>
+    <div class="sw-face">
+      <div class="status" id="pmMode" style="font-weight:600;font-size:1.1rem">Focus time</div>
+      <div class="readout big" id="pmReadout">25:00</div>
+      <div class="bar"><div id="pmBar"></div></div>
+      <div class="dots" id="pmDots" aria-label="Focus sessions done"><i></i><i></i><i></i><i></i></div>
+      <div class="status" id="pmStatus">4 focus rounds earn a long break</div>
+    </div>
+    <div class="presets">
+      <label class="len">Focus <input type="number" id="pmF" min="1" max="90" value="25"></label>
+      <label class="len">Break <input type="number" id="pmB" min="1" max="30" value="5"></label>
+      <label class="len">Long <input type="number" id="pmL" min="1" max="60" value="15"></label>
+    </div>
+    <div class="controls">
+      <button class="btn ghost" id="pmReset">Reset</button>
+      <button class="btn primary" id="pmStart">Start</button>
+      <button class="btn accent" id="pmSkip">Skip</button>
+    </div>
+  </section>
+  <p class="hint">Space starts and pauses. Press L for a lap. Pomodoro length is in minutes.</p>
 </main>
 <script src="js/app.js"></script>
 </body>
