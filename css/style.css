@@ -24,11 +24,11 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',system-ui,sans-serif;c
 .pal.cheer{animation:cheer .6s ease-in-out 6}
 @keyframes cheer{40%{transform:translateY(-34px) rotate(-5deg)}70%{transform:translateY(-10px) rotate(5deg)}}
 .card{position:relative;z-index:2;width:min(480px,100%);background:var(--card);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3);border:3px solid #fff;border-radius:34px;padding:22px 22px 14px;box-shadow:0 24px 50px -16px rgba(60,20,120,.45),0 0 0 6px rgba(123,63,196,.14)}
-.tabs{position:relative;display:grid;grid-template-columns:1fr 1fr;background:#efe4ff;border-radius:999px;padding:5px;margin-bottom:18px}
-.tabs button{position:relative;z-index:1;border:0;background:none;font-family:inherit;font-weight:600;font-size:1.05rem;padding:10px;color:var(--plum-d);cursor:pointer;border-radius:999px;transition:color .25s}
+.tabs{position:relative;display:grid;grid-template-columns:repeat(3,1fr);background:#efe4ff;border-radius:999px;padding:5px;margin-bottom:18px}
+.tabs button{position:relative;z-index:1;border:0;background:none;font-family:inherit;font-weight:600;font-size:1rem;padding:10px 4px;color:var(--plum-d);cursor:pointer;border-radius:999px;transition:color .25s}
 .tabs button[aria-selected=true]{color:#fff}
-.tab-pill{position:absolute;top:5px;bottom:5px;left:5px;width:calc(50% - 5px);background:linear-gradient(135deg,#9a5ae0,var(--plum));border-radius:999px;box-shadow:0 6px 12px -4px rgba(90,42,153,.6);transition:transform .35s cubic-bezier(.5,1.6,.5,1)}
-.tabs.sw .tab-pill{transform:translateX(100%)}
+.tab-pill{position:absolute;top:5px;bottom:5px;left:5px;width:calc((100% - 10px)/3);background:linear-gradient(135deg,#9a5ae0,var(--plum));border-radius:999px;box-shadow:0 6px 12px -4px rgba(90,42,153,.6);transition:transform .35s cubic-bezier(.5,1.6,.5,1)}
+.tab-pill{transform:translateX(calc(var(--i,0)*100%))}
 .panel{display:flex;flex-direction:column;align-items:center;gap:14px}
 .panel[hidden]{display:none}
 .ring-wrap{position:relative;width:min(280px,72vw);aspect-ratio:1}
@@ -67,3 +67,24 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',system-ui,sans-serif;c
 @keyframes shake{25%{transform:rotate(-1.5deg)}75%{transform:rotate(1.5deg)}}
 @media (max-width:520px){.cast .pal:nth-child(n+4){display:none}.sun{width:70px;height:70px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+.toggles{position:fixed;top:12px;right:12px;z-index:5;display:flex;gap:8px}
+.toggles button{width:44px;height:44px;border-radius:50%;border:3px solid #fff;background:rgba(255,255,255,.75);backdrop-filter:blur(8px);font-size:1.2rem;cursor:pointer;box-shadow:0 6px 14px -6px rgba(60,20,120,.5);transition:transform .15s}
+.toggles button:hover{transform:scale(1.1) rotate(-6deg)}
+.bar{height:12px;border-radius:99px;background:#e6d8fa;margin:12px 18px 8px;overflow:hidden}
+.bar div{height:100%;width:0;background:linear-gradient(90deg,#5fd35c,#38a845);border-radius:99px;transition:width .3s linear}
+.bar.brk div{background:linear-gradient(90deg,#ffe27a,#ffb700)}
+.dots{display:flex;gap:8px;justify-content:center;margin-bottom:6px}
+.dots i{width:16px;height:16px;border-radius:50%;background:#e6d8fa;transition:background .3s,transform .3s}
+.dots i.on{background:var(--plum);transform:scale(1.15)}
+.len{display:grid;gap:3px;font-size:.8rem;text-align:center;color:#7a5fa8}
+.len input{width:64px;font-family:inherit;font-weight:600;font-size:1.1rem;text-align:center;padding:5px;border:3px solid #e6d8fa;border-radius:12px;color:var(--plum-d)}
+.stars{position:absolute;inset:0;opacity:0;transition:opacity 1s;background-image:radial-gradient(2px 2px at 10% 20%,#fff,transparent),radial-gradient(2px 2px at 30% 60%,#fff,transparent),radial-gradient(3px 3px at 55% 15%,#fff,transparent),radial-gradient(2px 2px at 75% 40%,#fff,transparent),radial-gradient(2px 2px at 90% 25%,#fff,transparent),radial-gradient(2px 2px at 45% 40%,#fff,transparent);animation:twinkle 3s ease-in-out infinite}
+@keyframes twinkle{50%{filter:brightness(.4)}}
+body{transition:background 1s}
+body[data-night]{background:linear-gradient(#14123a,#3b2a7a 75%)}
+body[data-night] .stars{opacity:1}
+body[data-night] .sun{background:radial-gradient(circle at 35% 35%,#fff,#d8def5);box-shadow:0 0 0 14px rgba(220,230,255,.15),0 0 60px 20px rgba(200,210,255,.25);animation:none}
+body[data-night] .cloud{opacity:.25}
+body[data-night] .h1{filter:brightness(.55) hue-rotate(20deg)}body[data-night] .h2{filter:brightness(.5)}
+body[data-night] .pal{filter:brightness(.8) drop-shadow(0 8px 4px rgba(0,0,40,.4))}
