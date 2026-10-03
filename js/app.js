@@ -34,14 +34,16 @@ for(let i=0;i<26;i++){const e=document.createElement('i');e.style.left=Math.rand
 function cheer(){const pals=document.querySelectorAll('.pal');pals.forEach((p,i)=>{p.classList.remove('cheer');void p.offsetWidth;p.style.animationDelay=i*.1+'s';p.classList.add('cheer');});
  const card=document.querySelector('.card');card.classList.add('done');
  setTimeout(()=>{card.classList.remove('done');pals.forEach(p=>{p.classList.remove('cheer');p.style.animationDelay='';});},4200);}
-function chime(){try{const a=new(window.AudioContext||window.webkitAudioContext)();
+let muted=false;
+function chime(){if(muted)return;try{const a=new(window.AudioContext||window.webkitAudioContext)();
  [660,880,1100,880,1320].forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain(),t=a.currentTime+i*.22;o.type='triangle';o.frequency.value=f;
  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.3,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+.3);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.32);});}catch(e){}}
 /* Tabs */
 let tab='timer';
-function setTab(t){tab=t;document.querySelector('.tabs').classList.toggle('sw',t==='stopwatch');
+function setTab(t){tab=t;document.querySelector('.tab-pill').style.setProperty('--i',['timer','stopwatch','pomodoro'].indexOf(t));
+ document.querySelector('.tabs').style.setProperty('--i',['timer','stopwatch','pomodoro'].indexOf(t));
  document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
- $('timer').hidden=t!=='timer';$('stopwatch').hidden=t!=='stopwatch';}
+ $('timer').hidden=t!=='timer';$('stopwatch').hidden=t!=='stopwatch';$('pomodoro').hidden=t!=='pomodoro';}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 /* Timer */
 const C=2*Math.PI*98;let total=300000,left=300000,tEnd=0,tRaf=0,tRun=false;
@@ -72,5 +74,31 @@ function swLap(){if(!swRun)return;lapN++;const li=document.createElement('li');l
 function swReset(){swRun=false;cancelAnimationFrame(swRaf);sw=lastLap=lapN=0;$('swReadout').textContent='00:00.00';$('laps').innerHTML='';$('swStart').textContent='Start';$('swStart').classList.remove('running');$('swStatus').textContent='Tap start to begin';$('swLap').disabled=true;}
 $('swStart').onclick=swToggle;$('swLap').onclick=swLap;$('swReset').onclick=swReset;
 addEventListener('keydown',e=>{const t=document.activeElement.tagName;
- if(e.code==='Space'&&!/INPUT|BUTTON/.test(t)){e.preventDefault();tab==='timer'?timerToggle():swToggle();}
+ if(e.code==='Space'&&!/INPUT|BUTTON/.test(t)){e.preventDefault();({timer:timerToggle,stopwatch:swToggle,pomodoro:pmToggle})[tab]();}
  if((e.key==='l'||e.key==='L')&&tab==='stopwatch'&&t!=='INPUT')swLap();});
+
+/* Pomodoro */
+let pm={mode:'focus',done:0,left:25*60e3,total:25*60e3,run:false,end:0,raf:0};
+const pmLen=m=>(+$({focus:'pmF',short:'pmB',long:'pmL'}[m]).value||1)*60e3;
+const pmName={focus:'Focus time',short:'Short break',long:'Long break'};
+const fmtP=ms=>{const s=Math.ceil(ms/1000);return`${pad(Math.floor(s/60))}:${pad(s%60)}`};
+function drawP(){$('pmReadout').textContent=fmtP(pm.left);$('pmMode').textContent=pmName[pm.mode];
+ $('pmBar').style.width=(100*(1-pm.left/pm.total))+'%';$('pmBar').parentNode.classList.toggle('brk',pm.mode!=='focus');
+ document.querySelectorAll('#pmDots i').forEach((d,i)=>d.classList.toggle('on',i<pm.done));}
+function pmSet(m){pm.mode=m;pm.total=pm.left=pmLen(m);drawP();}
+function pmNext(auto){pm.run=false;cancelAnimationFrame(pm.raf);
+ if(pm.mode==='focus'){pm.done++;if(pm.done>=4){pmSet('long');}else pmSet('short');}
+ else{if(pm.mode==='long')pm.done=0;pmSet('focus');}
+ drawP();$('pmStart').textContent='Start';$('pmStart').classList.remove('running');
+ $('pmStatus').textContent=auto?(pm.mode==='focus'?'Break over. Ready to focus?':'Great work! Take a break.'):'Skipped ahead';
+ if(auto){chime();cheer();}}
+function pmTick(){pm.left=Math.max(0,pm.end-performance.now());drawP();if(pm.left<=0){pmNext(true);return;}pm.raf=requestAnimationFrame(pmTick);}
+function pmToggle(){if(pm.run){pm.run=false;cancelAnimationFrame(pm.raf);$('pmStart').textContent='Resume';$('pmStart').classList.remove('running');$('pmStatus').textContent='Paused';return;}
+ pm.run=true;pm.end=performance.now()+pm.left;$('pmStart').textContent='Pause';$('pmStart').classList.add('running');$('pmStatus').textContent=pm.mode==='focus'?'Stay focused':'Relax and stretch';pmTick();}
+function pmReset(){pm.run=false;cancelAnimationFrame(pm.raf);pm.done=0;pmSet('focus');$('pmStart').textContent='Start';$('pmStart').classList.remove('running');$('pmStatus').textContent='4 focus rounds earn a long break';}
+$('pmStart').onclick=pmToggle;$('pmReset').onclick=pmReset;$('pmSkip').onclick=()=>pmNext(false);
+['pmF','pmB','pmL'].forEach(id=>$(id).oninput=()=>{if(!pm.run&&pm.left===pm.total)pmSet(pm.mode);});
+drawP();
+/* Sound + day/night toggles */
+$('muteBtn').onclick=e=>{muted=!muted;e.currentTarget.textContent=muted?'🔕':'🔔';e.currentTarget.setAttribute('aria-pressed',muted);};
+$('nightBtn').onclick=e=>{const n=document.body.toggleAttribute('data-night');e.currentTarget.textContent=n?'☀️':'🌙';e.currentTarget.setAttribute('aria-pressed',n);};
